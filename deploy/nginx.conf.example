@@ -1,0 +1,69 @@
+# /etc/nginx/sites-available/fn-webstore
+# Adjust the domain and certificate paths. The app itself binds 127.0.0.1.
+
+limit_req_zone $binary_remote_addr zone=fn_checkout:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=fn_webhook:10m rate=60r/m;
+limit_req_zone $binary_remote_addr zone=fn_login:10m rate=10r/m;
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name store.example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name store.example.com;
+
+    ssl_certificate     /etc/letsencrypt/live/store.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/store.example.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer" always;
+
+    client_max_body_size 1m;
+
+    # Phase 1: static assets. Comment out until the directory exists.
+    # location /static/ {
+    #     alias /opt/fn-webstore/fn_webstore/static/;
+    #     expires 7d;
+    #     add_header Cache-Control "public, max-age=604800, immutable";
+    # }
+
+    location ~ ^/(checkout|order/lookup) {
+        limit_req zone=fn_checkout burst=20 nodelay;
+        proxy_pass http://127.0.0.1:8088;
+        include /etc/nginx/proxy_params;
+    }
+
+    location ~ ^/webhooks/ {
+        limit_req zone=fn_webhook burst=60 nodelay;
+        proxy_pass http://127.0.0.1:8088;
+        include /etc/nginx/proxy_params;
+    }
+
+    location /admin {
+        limit_req zone=fn_login burst=10 nodelay;
+        # Recommended: uncomment and set your own address.
+        # allow 203.0.113.10;
+        # deny all;
+        proxy_pass http://127.0.0.1:8088;
+        include /etc/nginx/proxy_params;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8088;
+        include /etc/nginx/proxy_params;
+    }
+
+    location = /healthz {
+        access_log off;
+        proxy_pass http://127.0.0.1:8088;
+        include /etc/nginx/proxy_params;
+    }
+}

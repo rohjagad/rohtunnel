@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local configuration and secrets
+.env
+.env.local
+*.pem
+*.key
+panel-token
+secret.key
+
+# Runtime state
+var/
+backups/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.sqlite3-journal
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

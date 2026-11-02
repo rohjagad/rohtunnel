@@ -1,0 +1,43 @@
+# /etc/systemd/system/fn-webstore-worker.service
+# TARGET EXAMPLE — the `worker` command is implemented in Phase 2. Do not
+# enable this unit until `python3 -m fn_webstore worker --help` works.
+#
+# Exactly one worker may run. The process also takes a flock, so a second
+# instance exits instead of racing the first.
+
+[Unit]
+Description=fn-webstore provisioning worker
+Documentation=https://github.com/rohjagad/fn-webstore
+After=network-online.target fn-webstore.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fnwebstore
+Group=fnwebstore
+WorkingDirectory=/opt/fn-webstore
+EnvironmentFile=/etc/fn-webstore/env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m fn_webstore worker
+Restart=on-failure
+RestartSec=5
+# Longer than the 200 s panel client timeout.
+TimeoutStopSec=230
+UMask=0077
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/lib/fn-webstore /var/backups/fn-webstore
+RuntimeDirectory=fn-webstore
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=yes
+
+[Install]
+WantedBy=multi-user.target

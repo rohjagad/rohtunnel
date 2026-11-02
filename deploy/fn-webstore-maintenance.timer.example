@@ -1,0 +1,15 @@
+# /etc/systemd/system/fn-webstore-maintenance.timer
+# TARGET EXAMPLE — enable after the maintenance command lands.
+
+[Unit]
+Description=Run fn-webstore maintenance every minute
+Documentation=https://github.com/rohjagad/fn-webstore
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=15s
+Unit=fn-webstore-maintenance.service
+
+[Install]
+WantedBy=timers.target
