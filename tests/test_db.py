@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from fn_webstore.db import init_db, migrate, schema_version, table_count, transaction
+from rohtunnel.db import init_db, migrate, schema_version, table_count, transaction
 
 
 class DatabaseTests(unittest.TestCase):
@@ -29,7 +29,7 @@ class DatabaseTests(unittest.TestCase):
     def test_product_constraints(self) -> None:
         self.conn.execute(
             "INSERT INTO panels (name, base_url, token_file) VALUES (?, ?, ?)",
-            ("local", "http://127.0.0.1:9000", "/etc/fn-webstore/panel-token"),
+            ("local", "http://127.0.0.1:9000", "/etc/rohtunnel/panel-token"),
         )
         self.conn.execute(
             """

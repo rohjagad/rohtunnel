@@ -9,9 +9,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from fn_webstore.config import Config
-from fn_webstore.db import init_db
-from fn_webstore.server import create_server
+from rohtunnel.config import Config
+from rohtunnel.db import init_db
+from rohtunnel.server import create_server
 
 
 class ServerTests(unittest.TestCase):
@@ -72,7 +72,7 @@ class ServerTests(unittest.TestCase):
         status, body, content_type = self._get("/")
         self.assertEqual(status, 200)
         self.assertTrue(content_type.startswith("text/html"))
-        self.assertIn(b"fn-webstore", body)
+        self.assertIn(b"RohTunnel", body)
 
     def test_not_found(self) -> None:
         status, _, _ = self._get("/nope")

@@ -1,0 +1,15 @@
+# /etc/systemd/system/rohtunnel-maintenance.timer
+# TARGET EXAMPLE — enable after the maintenance command lands.
+
+[Unit]
+Description=Run RohTunnel maintenance every minute
+Documentation=https://github.com/rohjagad/RohTunnel
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=15s
+Unit=rohtunnel-maintenance.service
+
+[Install]
+WantedBy=timers.target

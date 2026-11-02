@@ -1,4 +1,4 @@
-# fn-webstore — Project Plan
+# RohTunnel — Project Plan
 
 | | |
 | :-- | :-- |
@@ -29,7 +29,7 @@ a working account.
 
 `fn-autosc-api` already exposes the panel's create/list/renew/delete actions
 over HTTP, and `fn-autosc/project-information/fn-api.md` explicitly says the
-API was restored for a planned web UI. `fn-webstore` is that UI and the
+API was restored for a planned web UI. RohTunnel is that UI and the
 automation around it.
 
 ---
@@ -342,12 +342,12 @@ The transition table and invariants are in `docs/ARCHITECTURE.md`.
 flowchart LR
     C[Customer browser] -->|HTTPS| N[nginx]
     A[Admin browser] -->|HTTPS| N
-    N -->|proxy 127.0.0.1:8088| W[fn-webstore web]
+    N -->|proxy 127.0.0.1:8088| W[RohTunnel web]
     N -->|/webhooks/*| W
     W --> DB[(SQLite WAL)]
     W -->|enqueue| DB
     P[Payment gateway] -->|signed webhook| N
-    K[fn-webstore worker] -->|claim job| DB
+    K[RohTunnel worker] -->|claim job| DB
     K -->|HTTP + token| API[fn-autosc-api]
     API --> PANEL[FN AutoSC panel]
     K -->|SMTP / Telegram| M[Notifications]
@@ -507,7 +507,7 @@ changes the provision state.
 
 ## 12. Security plan
 
-The panel API token is equivalent to root on the VPN host. The webstore is
+The panel API token is equivalent to root on the VPN host. RohTunnel is
 therefore treated as a privileged internal service, not a generic website.
 
 | Threat | Control |
@@ -535,10 +535,10 @@ Additional rules:
 - Admin sessions expire after 12 hours; rotation on login.
 - Secrets are read from environment or `0600` files, never committed.
 - Separate panel token for the store (append a line to `/etc/xray/.key` and
-  copy it to `/etc/fn-webstore/panel-token`), so it can be rotated without
+  copy it to `/etc/rohtunnel/panel-token`), so it can be rotated without
   invalidating other API clients.
-- Do not run the webstore as root. A dedicated `fnwebstore` user owns
-  `/var/lib/fn-webstore` and reads only its own token copy.
+- Do not run RohTunnel as root. A dedicated `rohtunnel` user owns
+  `/var/lib/rohtunnel` and reads only its own token copy.
 
 ---
 
@@ -547,17 +547,17 @@ Additional rules:
 ### Deployment target
 
 ```text
-/etc/fn-webstore/env                 0600  fnwebstore
-/etc/fn-webstore/panel-token         0600  fnwebstore
-/var/lib/fn-webstore/webstore.sqlite3 0600 fnwebstore
-/var/backups/fn-webstore/            encrypted snapshots, off-host copy
+/etc/rohtunnel/env                 0600  rohtunnel
+/etc/rohtunnel/panel-token         0600  rohtunnel
+/var/lib/rohtunnel/rohtunnel.sqlite3 0600 rohtunnel
+/var/backups/rohtunnel/            encrypted snapshots, off-host copy
 ```
 
 ### systemd units
 
-- `fn-webstore.service` — `python3 -m fn_webstore serve`
-- `fn-webstore-worker.service` — `python3 -m fn_webstore worker`
-- `fn-webstore-maintenance.timer` — `python3 -m fn_webstore maintenance`
+- `rohtunnel.service` — `python3 -m rohtunnel serve`
+- `rohtunnel-worker.service` — `python3 -m rohtunnel worker`
+- `rohtunnel-maintenance.timer` — `python3 -m rohtunnel maintenance`
 
 Examples are in [`deploy/`](../deploy). The worker unit has
 `Restart=on-failure` and a graceful stop timeout longer than the panel client
@@ -575,7 +575,7 @@ timeout.
 
 ### Backups
 
-- `sqlite3 webstore.sqlite3 ".backup '/var/backups/fn-webstore/db-YYYYmmdd.sqlite3'"`
+- `sqlite3 rohtunnel.sqlite3 ".backup '/var/backups/rohtunnel/db-YYYYmmdd.sqlite3'"`
 - Compress and encrypt with age/openssl, copy off-host.
 - Keep 14 daily, 8 weekly, 6 monthly.
 - Restore drill monthly; a backup that has never been restored is a hope.

@@ -1,4 +1,4 @@
-# /etc/nginx/sites-available/fn-webstore
+# /etc/nginx/sites-available/rohtunnel
 # Adjust the domain and certificate paths. The app itself binds 127.0.0.1.
 
 limit_req_zone $binary_remote_addr zone=fn_checkout:10m rate=10r/m;
@@ -30,7 +30,7 @@ server {
 
     # Phase 1: static assets. Comment out until the directory exists.
     # location /static/ {
-    #     alias /opt/fn-webstore/fn_webstore/static/;
+    #     alias /opt/rohtunnel/rohtunnel/static/;
     #     expires 7d;
     #     add_header Cache-Control "public, max-age=604800, immutable";
     # }

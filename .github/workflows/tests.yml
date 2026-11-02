@@ -26,13 +26,13 @@ jobs:
         run: python -m unittest discover -s tests -v
 
       - name: Compile check
-        run: python -m compileall -q fn_webstore tests
+        run: python -m compileall -q rohtunnel tests
 
       - name: CLI smoke test
         run: |
           tmp="$(mktemp -d)"
-          FN_WEBSTORE_DB="$tmp/store.sqlite3" python -m fn_webstore initdb
-          FN_WEBSTORE_DB="$tmp/store.sqlite3" python -m fn_webstore migrate
-          FN_WEBSTORE_DB="$tmp/store.sqlite3" FN_PANEL_TOKEN_FILE="$tmp/missing" \
-            python -m fn_webstore doctor
+          ROHTUNNEL_DB="$tmp/store.sqlite3" python -m rohtunnel initdb
+          ROHTUNNEL_DB="$tmp/store.sqlite3" python -m rohtunnel migrate
+          ROHTUNNEL_DB="$tmp/store.sqlite3" ROHTUNNEL_PANEL_TOKEN_FILE="$tmp/missing" \
+            python -m rohtunnel doctor
           rm -rf "$tmp"

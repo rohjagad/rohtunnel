@@ -8,38 +8,38 @@ accordingly.
 ## 1. Service user and directories
 
 ```bash
-sudo useradd --system --home /var/lib/fn-webstore \
-     --shell /usr/sbin/nologin fnwebstore
+sudo useradd --system --home /var/lib/rohtunnel \
+     --shell /usr/sbin/nologin rohtunnel
 
-sudo install -d -o root:root -m 0755 /opt/fn-webstore
-sudo install -d -o fnwebstore:fnwebstore -m 0700 \
-     /var/lib/fn-webstore /var/backups/fn-webstore
+sudo install -d -o root:root -m 0755 /opt/rohtunnel
+sudo install -d -o rohtunnel:rohtunnel -m 0700 \
+     /var/lib/rohtunnel /var/backups/rohtunnel
 
 sudo install -o root:root -m 0644 \
-     deploy/fn-webstore.service.example \
-     /etc/systemd/system/fn-webstore.service
+     deploy/rohtunnel.service.example \
+     /etc/systemd/system/rohtunnel.service
 ```
 
-Copy the repository to `/opt/fn-webstore` (or a release directory) and make
+Copy the repository to `/opt/rohtunnel` (or a release directory) and make
 it read-only to the service user.
 
 ## 2. Configuration
 
 ```bash
-sudo install -d -o root:root -m 0755 /etc/fn-webstore
-sudo install -o fnwebstore:fnwebstore -m 0600 /dev/null /etc/fn-webstore/env
-sudo editor /etc/fn-webstore/env
+sudo install -d -o root:root -m 0755 /etc/rohtunnel
+sudo install -o rohtunnel:rohtunnel -m 0600 /dev/null /etc/rohtunnel/env
+sudo editor /etc/rohtunnel/env
 ```
 
 Start from `.env.example`. At minimum set:
 
 ```ini
-FN_WEBSTORE_ENV=production
-FN_WEBSTORE_BASE_URL=https://store.example.com
-FN_WEBSTORE_DB=/var/lib/fn-webstore/webstore.sqlite3
-FN_WEBSTORE_SECRET_KEY=<48 random characters>
-FN_PANEL_BASE_URL=http://127.0.0.1:9000
-FN_PANEL_TOKEN_FILE=/etc/fn-webstore/panel-token
+ROHTUNNEL_ENV=production
+ROHTUNNEL_BASE_URL=https://store.example.com
+ROHTUNNEL_DB=/var/lib/rohtunnel/rohtunnel.sqlite3
+ROHTUNNEL_SECRET_KEY=<48 random characters>
+ROHTUNNEL_PANEL_BASE_URL=http://127.0.0.1:9000
+ROHTUNNEL_PANEL_TOKEN_FILE=/etc/rohtunnel/panel-token
 ```
 
 ## 3. Panel token
@@ -51,9 +51,9 @@ store's own file:
 ```bash
 TOKEN=$(head -c 32 /dev/urandom | base64 | tr -d '/+=\n' | head -c 40)
 echo "$TOKEN" | sudo tee -a /etc/xray/.key >/dev/null
-echo "$TOKEN" | sudo tee /etc/fn-webstore/panel-token >/dev/null
-sudo chown fnwebstore:fnwebstore /etc/fn-webstore/panel-token
-sudo chmod 0600 /etc/fn-webstore/panel-token
+echo "$TOKEN" | sudo tee /etc/rohtunnel/panel-token >/dev/null
+sudo chown rohtunnel:rohtunnel /etc/rohtunnel/panel-token
+sudo chmod 0600 /etc/rohtunnel/panel-token
 sudo systemctl restart api.service
 ```
 
@@ -62,10 +62,10 @@ Do not give `www-data` or the webroot access to `/etc/xray/.key`.
 ## 4. Database
 
 ```bash
-sudo -u fnwebstore sh -c \
-  'set -a; . /etc/fn-webstore/env; set +a; exec python3 -m fn_webstore initdb'
-sudo -u fnwebstore sh -c \
-  'set -a; . /etc/fn-webstore/env; set +a; exec python3 -m fn_webstore doctor'
+sudo -u rohtunnel sh -c \
+  'set -a; . /etc/rohtunnel/env; set +a; exec python3 -m rohtunnel initdb'
+sudo -u rohtunnel sh -c \
+  'set -a; . /etc/rohtunnel/env; set +a; exec python3 -m rohtunnel doctor'
 ```
 
 The env file is sourced as shell, so keep values shell-safe (quote values
@@ -75,8 +75,8 @@ with spaces). Do not put untrusted content in it.
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now fn-webstore.service
-sudo systemctl status fn-webstore.service
+sudo systemctl enable --now rohtunnel.service
+sudo systemctl status rohtunnel.service
 ```
 
 ## 6. nginx
@@ -92,8 +92,8 @@ sudo systemctl reload nginx
 ## 7. Backups
 
 ```bash
-sudo -u fnwebstore sqlite3 /var/lib/fn-webstore/webstore.sqlite3 \
-  ".backup '/var/backups/fn-webstore/db-$(date +%F).sqlite3'"
+sudo -u rohtunnel sqlite3 /var/lib/rohtunnel/rohtunnel.sqlite3 \
+  ".backup '/var/backups/rohtunnel/db-$(date +%F).sqlite3'"
 ```
 
 Encrypt before copying off-host. Test a restore monthly; a backup that has

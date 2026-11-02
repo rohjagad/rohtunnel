@@ -1,5 +1,5 @@
--- fn-webstore initial schema
--- Migration 0001. Applied by `fn-webstore initdb` / `fn-webstore migrate`.
+-- RohTunnel initial schema
+-- Migration 0001. Applied by `rohtunnel initdb` / `rohtunnel migrate`.
 -- All timestamps are UTC ISO-8601 text. Money is integer IDR.
 
 PRAGMA foreign_keys = ON;

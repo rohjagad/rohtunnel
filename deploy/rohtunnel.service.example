@@ -1,21 +1,21 @@
-# /etc/systemd/system/fn-webstore.service
+# /etc/systemd/system/rohtunnel.service
 # Phase 0: this unit runs the walking skeleton (`serve`). Reload/upgrade this
 # file when the storefront and admin routes land.
 
 [Unit]
-Description=fn-webstore HTTP service
-Documentation=https://github.com/rohjagad/fn-webstore
+Description=RohTunnel HTTP service
+Documentation=https://github.com/rohjagad/RohTunnel
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=fnwebstore
-Group=fnwebstore
-WorkingDirectory=/opt/fn-webstore
-EnvironmentFile=/etc/fn-webstore/env
+User=rohtunnel
+Group=rohtunnel
+WorkingDirectory=/opt/rohtunnel
+EnvironmentFile=/etc/rohtunnel/env
 Environment=PYTHONDONTWRITEBYTECODE=1
-ExecStart=/usr/bin/python3 -m fn_webstore serve
+ExecStart=/usr/bin/python3 -m rohtunnel serve
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=15
@@ -30,8 +30,8 @@ ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-ReadWritePaths=/var/lib/fn-webstore /var/backups/fn-webstore
-RuntimeDirectory=fn-webstore
+ReadWritePaths=/var/lib/rohtunnel /var/backups/rohtunnel
+RuntimeDirectory=rohtunnel
 RuntimeDirectoryMode=0700
 RuntimeDirectoryPreserve=yes
 

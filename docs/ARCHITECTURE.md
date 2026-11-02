@@ -32,9 +32,9 @@ The architecture is shaped around these constraints.
 
 | Component | Runs as | Responsibility |
 | :-- | :-- | :-- |
-| `fn-webstore serve` | `fnwebstore` | public storefront, order pages, admin, webhooks |
-| `fn-webstore worker` | `fnwebstore` | claims provision/renew jobs, calls the panel |
-| `fn-webstore maintenance` | timer | payments reconciliation, expiry mirror, reminders, stale jobs, backups |
+| `rohtunnel serve` | `rohtunnel` | public storefront, order pages, admin, webhooks |
+| `rohtunnel worker` | `rohtunnel` | claims provision/renew jobs, calls the panel |
+| `rohtunnel maintenance` | timer | payments reconciliation, expiry mirror, reminders, stale jobs, backups |
 | SQLite | file | orders, payments, jobs, account mirror, audit |
 | nginx | root | TLS, static files, proxy, rate limits, admin allowlist |
 | `fn-autosc-api` | root, `127.0.0.1:9000` | panel operations |
@@ -65,7 +65,7 @@ take the storefront down.
 ### Worker process
 
 - Exactly one instance, enforced by:
-  1. a `flock` on `/run/fn-webstore/worker.lock`;
+  1. a `flock` on `/run/rohtunnel/worker.lock`;
   2. an atomic job claim (`BEGIN IMMEDIATE`, select one, update one).
 - Handles one job at a time. This is deliberate: the panel API serializes
   anyway, and a single worker makes ordering and reconciliation simple.
@@ -455,7 +455,7 @@ Internet
 nginx ── static, rate limits, admin allowlist
   │  127.0.0.1:8088
   ▼
-fn-webstore web  ── SQLite ── fn-webstore worker
+RohTunnel web  ── SQLite ── RohTunnel worker
   │                              │ HTTP + token, loopback
   │                              ▼
   │                        fn-autosc-api (root)
@@ -480,7 +480,7 @@ customer browser / admin browser
 ### Threat model notes
 
 - **Root-adjacent service.** If an attacker gets code execution in
-  `fn-webstore`, they can read the panel token and control the VPN host. The
+  RohTunnel, they can read the panel token and control the VPN host. The
   mitigation is a small attack surface, no uploads, no shell execution from
   user input, strict escaping, and keeping the service off the public
   interface except through nginx.
@@ -504,9 +504,9 @@ customer browser / admin browser
 ### 10.1 Same-host topology (recommended)
 
 ```text
-store.example.com ──nginx──> 127.0.0.1:8088 fn-webstore
+store.example.com ──nginx──> 127.0.0.1:8088 RohTunnel
                                     │
-                                    ├── SQLite /var/lib/fn-webstore
+                                    ├── SQLite /var/lib/rohtunnel
                                     └── worker ──> 127.0.0.1:9000 fn-autosc-api
                                                           │
                                                           └── panel scripts
@@ -525,30 +525,30 @@ configuration but is a larger attack surface; prefer same-host.
 ### 10.3 Files and permissions
 
 ```text
-/opt/fn-webstore/                        root:root 0755  (code, read-only to service)
-/etc/fn-webstore/env                     fnwebstore:fnwebstore 0600
-/etc/fn-webstore/panel-token             fnwebstore:fnwebstore 0600
-/var/lib/fn-webstore/webstore.sqlite3    fnwebstore:fnwebstore 0600
-/var/lib/fn-webstore/                    fnwebstore:fnwebstore 0700
-/var/backups/fn-webstore/                fnwebstore:fnwebstore 0700
-/run/fn-webstore/                        fnwebstore:fnwebstore 0700
+/opt/rohtunnel/                        root:root 0755  (code, read-only to service)
+/etc/rohtunnel/env                     rohtunnel:rohtunnel 0600
+/etc/rohtunnel/panel-token             rohtunnel:rohtunnel 0600
+/var/lib/rohtunnel/rohtunnel.sqlite3    rohtunnel:rohtunnel 0600
+/var/lib/rohtunnel/                    rohtunnel:rohtunnel 0700
+/var/backups/rohtunnel/                rohtunnel:rohtunnel 0700
+/run/rohtunnel/                        rohtunnel:rohtunnel 0700
 ```
 
 ### 10.4 systemd
 
 ```ini
 [Service]
-User=fnwebstore
-Group=fnwebstore
-WorkingDirectory=/opt/fn-webstore
-EnvironmentFile=/etc/fn-webstore/env
-ExecStart=/usr/bin/python3 -m fn_webstore serve
+User=rohtunnel
+Group=rohtunnel
+WorkingDirectory=/opt/rohtunnel
+EnvironmentFile=/etc/rohtunnel/env
+ExecStart=/usr/bin/python3 -m rohtunnel serve
 Restart=on-failure
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=yes
-ReadWritePaths=/var/lib/fn-webstore /var/backups/fn-webstore /run/fn-webstore
+ReadWritePaths=/var/lib/rohtunnel /var/backups/rohtunnel /run/rohtunnel
 ```
 
 The worker unit is the same with `worker` instead of `serve`, plus a
@@ -568,12 +568,12 @@ The worker unit is the same with `worker` instead of `serve`, plus a
 ### 10.6 Backups and restore
 
 ```bash
-sqlite3 /var/lib/fn-webstore/webstore.sqlite3 \
-  ".backup '/var/backups/fn-webstore/db-$(date +%F).sqlite3'"
+sqlite3 /var/lib/rohtunnel/rohtunnel.sqlite3 \
+  ".backup '/var/backups/rohtunnel/db-$(date +%F).sqlite3'"
 ```
 
 Then compress and encrypt. Test restore into a temporary directory and run
-`fn-webstore doctor --db <restored>` before trusting the backup.
+`rohtunnel doctor --db <restored>` before trusting the backup.
 
 ---
 
@@ -638,7 +638,7 @@ Admin dashboard and `/readyz` are enough at launch. Counters:
 ## 13. Code layout (target)
 
 ```text
-fn_webstore/
+rohtunnel/
   __init__.py
   __main__.py          CLI: initdb, serve, worker, maintenance, doctor
   config.py            environment + secret files

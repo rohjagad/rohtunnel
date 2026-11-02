@@ -1,0 +1,29 @@
+# /etc/systemd/system/rohtunnel-maintenance.service
+# TARGET EXAMPLE — the `maintenance` command is implemented in Phase 2/5.
+
+[Unit]
+Description=RohTunnel maintenance pass
+Documentation=https://github.com/rohjagad/RohTunnel
+After=network-online.target rohtunnel.service
+
+[Service]
+Type=oneshot
+User=rohtunnel
+Group=rohtunnel
+WorkingDirectory=/opt/rohtunnel
+EnvironmentFile=/etc/rohtunnel/env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -m rohtunnel maintenance
+TimeoutStartSec=180
+UMask=0077
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/var/lib/rohtunnel /var/backups/rohtunnel

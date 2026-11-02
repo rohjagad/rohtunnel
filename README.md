@@ -1,4 +1,4 @@
-# fn-webstore
+# RohTunnel
 
 A self-hosted storefront and order-automation layer for VPN plans running on
 [FN AutoSC](https://github.com/rohjagad/fn-autosc).
@@ -10,7 +10,7 @@ themselves, and [`fn-autosc-api`](https://github.com/rohjagad/fn-autosc-api) is
 the only component allowed to create or change them.
 
 ```text
-customer ──> fn-webstore checkout ──> payment gateway
+customer ──> RohTunnel checkout ──> payment gateway
                     ▲                        │
                     │                  signed webhook
                     │                        ▼
@@ -65,9 +65,9 @@ Requirements: Python 3.11+ and SQLite (bundled with Python). No runtime
 dependencies.
 
 ```bash
-python3 -m fn_webstore initdb
-python3 -m fn_webstore doctor
-python3 -m fn_webstore serve
+python3 -m rohtunnel initdb
+python3 -m rohtunnel doctor
+python3 -m rohtunnel serve
 ```
 
 In another terminal:
@@ -84,7 +84,7 @@ python3 -m unittest discover -s tests -v
 ```
 
 Configuration is environment based; see [`.env.example`](.env.example). The
-default database is `./var/webstore.sqlite3` and the default bind is
+default database is `./var/rohtunnel.sqlite3` and the default bind is
 `127.0.0.1:8088`.
 
 ## Repository layout
@@ -97,7 +97,7 @@ default database is `./var/webstore.sqlite3` and the default bind is
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | issue-sized implementation phases and acceptance criteria |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | architecture decision records |
 | [`migrations/0001_init.sql`](migrations/0001_init.sql) | initial SQLite schema |
-| [`fn_webstore/`](fn_webstore) | Python package (walking skeleton) |
+| [`rohtunnel/`](rohtunnel) | Python package (walking skeleton) |
 | [`deploy/`](deploy) | nginx and systemd examples |
 | [`tests/`](tests) | standard-library test suite |
 

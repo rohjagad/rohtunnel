@@ -231,7 +231,7 @@ then a product mapping and tests here.
 unambiguous across logs, backups and future hosting changes.
 
 **Decision:** Store all timestamps as UTC ISO-8601 (`...Z`). Render in the
-configured timezone (`FN_WEBSTORE_TIMEZONE`, default `Asia/Jakarta`). Expiry
+configured timezone (`ROHTUNNEL_TIMEZONE`, default `Asia/Jakarta`). Expiry
 math uses UTC; day-boundary reminders use the display timezone.
 
 **Consequences:**
@@ -252,7 +252,7 @@ migration can take the store offline.
 
 **Decision:** Numbered SQL migrations applied in order, recorded in
 `schema_migrations`, executed in a transaction. No down migrations in v1.
-`fn-webstore migrate` takes a `.backup` snapshot before applying and refuses
+`rohtunnel migrate` takes a `.backup` snapshot before applying and refuses
 to run if the snapshot fails.
 
 **Consequences:**

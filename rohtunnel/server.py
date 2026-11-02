@@ -18,7 +18,7 @@ from . import __version__
 from .config import Config
 from .db import connect, schema_version
 
-log = logging.getLogger("fn_webstore.http")
+log = logging.getLogger("rohtunnel.http")
 
 
 class App:
@@ -66,7 +66,7 @@ def _home_page(config: Config) -> bytes:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>fn-webstore</title>
+  <title>RohTunnel</title>
   <style>
     :root {{ color-scheme: dark; }}
     body {{ margin: 0; font-family: ui-sans-serif, system-ui, sans-serif;
@@ -84,7 +84,7 @@ def _home_page(config: Config) -> bytes:
 <body>
 <main>
   <span class="tag">Phase 0 &middot; walking skeleton</span>
-  <h1>fn-webstore</h1>
+  <h1>RohTunnel</h1>
   <p>VPN storefront and order automation for FN AutoSC. The service is alive;
      the storefront, checkout, payment and provisioning routes arrive in the
      next phases.</p>
@@ -103,7 +103,7 @@ def _home_page(config: Config) -> bytes:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = f"fn-webstore/{__version__}"
+    server_version = f"rohtunnel/{__version__}"
     protocol_version = "HTTP/1.1"
     timeout = 30
 
@@ -192,7 +192,7 @@ def serve(config: Config) -> None:
     config.validate_for_serve()
     server = create_server(config)
     host, port = server.server_address[:2]
-    log.info("fn-webstore %s listening on %s:%s", __version__, host, port)
+    log.info("RohTunnel %s listening on %s:%s", __version__, host, port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

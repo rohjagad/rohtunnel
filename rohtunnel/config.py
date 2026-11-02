@@ -59,7 +59,7 @@ class Config:
     base_url: str = "http://127.0.0.1:8088"
     bind: str = "127.0.0.1"
     port: int = 8088
-    db_path: Path = Path("var/webstore.sqlite3")
+    db_path: Path = Path("var/rohtunnel.sqlite3")
     log_level: str = "INFO"
     timezone: str = "Asia/Jakarta"
 
@@ -72,35 +72,36 @@ class Config:
 
     @classmethod
     def from_env(cls) -> "Config":
-        env = _env("FN_WEBSTORE_ENV", "development")
-        port = _env_int("FN_WEBSTORE_PORT", 8088)
+        env = _env("ROHTUNNEL_ENV", "development")
+        port = _env_int("ROHTUNNEL_PORT", 8088)
         if not 0 <= port <= 65535:
-            raise ConfigError("FN_WEBSTORE_PORT must be between 0 and 65535")
+            raise ConfigError("ROHTUNNEL_PORT must be between 0 and 65535")
 
-        timeout = _env_float("FN_PANEL_TIMEOUT", 200.0)
+        timeout = _env_float("ROHTUNNEL_PANEL_TIMEOUT", 200.0)
         if timeout <= 0:
-            raise ConfigError("FN_PANEL_TIMEOUT must be greater than zero")
+            raise ConfigError("ROHTUNNEL_PANEL_TIMEOUT must be greater than zero")
 
         config = cls(
             env=env,
             base_url=_validate_url(
-                "FN_WEBSTORE_BASE_URL", _env("FN_WEBSTORE_BASE_URL", "http://127.0.0.1:8088")
+                "ROHTUNNEL_BASE_URL", _env("ROHTUNNEL_BASE_URL", "http://127.0.0.1:8088")
             ),
-            bind=_env("FN_WEBSTORE_BIND", "127.0.0.1"),
+            bind=_env("ROHTUNNEL_BIND", "127.0.0.1"),
             port=port,
-            db_path=_path("FN_WEBSTORE_DB", "var/webstore.sqlite3"),
-            log_level=_env("FN_WEBSTORE_LOG_LEVEL", "INFO").upper(),
-            timezone=_env("FN_WEBSTORE_TIMEZONE", "Asia/Jakarta"),
+            db_path=_path("ROHTUNNEL_DB", "var/rohtunnel.sqlite3"),
+            log_level=_env("ROHTUNNEL_LOG_LEVEL", "INFO").upper(),
+            timezone=_env("ROHTUNNEL_TIMEZONE", "Asia/Jakarta"),
             panel_base_url=_validate_url(
-                "FN_PANEL_BASE_URL", _env("FN_PANEL_BASE_URL", "http://127.0.0.1:9000")
+                "ROHTUNNEL_PANEL_BASE_URL",
+                _env("ROHTUNNEL_PANEL_BASE_URL", "http://127.0.0.1:9000"),
             ),
-            panel_token_file=_path("FN_PANEL_TOKEN_FILE", "var/panel-token"),
+            panel_token_file=_path("ROHTUNNEL_PANEL_TOKEN_FILE", "var/panel-token"),
             panel_timeout=timeout,
-            payment_provider=_env("FN_PAYMENT_PROVIDER", "manual"),
-            secret_key=_env("FN_WEBSTORE_SECRET_KEY", ""),
+            payment_provider=_env("ROHTUNNEL_PAYMENT_PROVIDER", "manual"),
+            secret_key=_env("ROHTUNNEL_SECRET_KEY", ""),
         )
         if config.log_level not in {"CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"}:
-            raise ConfigError("FN_WEBSTORE_LOG_LEVEL is not a valid Python log level")
+            raise ConfigError("ROHTUNNEL_LOG_LEVEL is not a valid Python log level")
         return config
 
     def with_overrides(self, **kwargs: object) -> "Config":
@@ -128,9 +129,9 @@ class Config:
         if self.env == "production":
             if not self.secret_key:
                 raise ConfigError(
-                    "FN_WEBSTORE_SECRET_KEY is required when FN_WEBSTORE_ENV=production"
+                    "ROHTUNNEL_SECRET_KEY is required when ROHTUNNEL_ENV=production"
                 )
             if self.base_url.startswith("http://") and "127.0.0.1" not in self.base_url:
                 raise ConfigError(
-                    "FN_WEBSTORE_BASE_URL must be https:// in production (except localhost)"
+                    "ROHTUNNEL_BASE_URL must be https:// in production (except localhost)"
                 )

@@ -1,24 +1,24 @@
-# /etc/systemd/system/fn-webstore-worker.service
+# /etc/systemd/system/rohtunnel-worker.service
 # TARGET EXAMPLE — the `worker` command is implemented in Phase 2. Do not
-# enable this unit until `python3 -m fn_webstore worker --help` works.
+# enable this unit until `python3 -m rohtunnel worker --help` works.
 #
 # Exactly one worker may run. The process also takes a flock, so a second
 # instance exits instead of racing the first.
 
 [Unit]
-Description=fn-webstore provisioning worker
-Documentation=https://github.com/rohjagad/fn-webstore
-After=network-online.target fn-webstore.service
+Description=RohTunnel provisioning worker
+Documentation=https://github.com/rohjagad/RohTunnel
+After=network-online.target rohtunnel.service
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=fnwebstore
-Group=fnwebstore
-WorkingDirectory=/opt/fn-webstore
-EnvironmentFile=/etc/fn-webstore/env
+User=rohtunnel
+Group=rohtunnel
+WorkingDirectory=/opt/rohtunnel
+EnvironmentFile=/etc/rohtunnel/env
 Environment=PYTHONDONTWRITEBYTECODE=1
-ExecStart=/usr/bin/python3 -m fn_webstore worker
+ExecStart=/usr/bin/python3 -m rohtunnel worker
 Restart=on-failure
 RestartSec=5
 # Longer than the 200 s panel client timeout.
@@ -34,8 +34,8 @@ ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-ReadWritePaths=/var/lib/fn-webstore /var/backups/fn-webstore
-RuntimeDirectory=fn-webstore
+ReadWritePaths=/var/lib/rohtunnel /var/backups/rohtunnel
+RuntimeDirectory=rohtunnel
 RuntimeDirectoryMode=0700
 RuntimeDirectoryPreserve=yes
 

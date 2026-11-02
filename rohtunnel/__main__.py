@@ -1,9 +1,9 @@
 """Command-line entry point.
 
-    python3 -m fn_webstore initdb
-    python3 -m fn_webstore serve
-    python3 -m fn_webstore doctor
-    python3 -m fn_webstore version
+    python3 -m rohtunnel initdb
+    python3 -m rohtunnel serve
+    python3 -m rohtunnel doctor
+    python3 -m rohtunnel version
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from .config import Config, ConfigError
 from .db import connect, init_db, schema_version, table_count
 from .server import serve
 
-log = logging.getLogger("fn_webstore")
+log = logging.getLogger("rohtunnel")
 
 
 def _load_config(args: argparse.Namespace) -> Config:
@@ -133,10 +133,10 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             warnings += 1
 
     if config.env == "production" and not config.secret_key:
-        print("FAIL secret: FN_WEBSTORE_SECRET_KEY is required in production")
+        print("FAIL secret: ROHTUNNEL_SECRET_KEY is required in production")
         failures += 1
     elif not config.secret_key:
-        print("WARN secret: FN_WEBSTORE_SECRET_KEY is not set (development only)")
+        print("WARN secret: ROHTUNNEL_SECRET_KEY is not set (development only)")
         warnings += 1
     else:
         print("OK   secret: configured (value not printed)")
@@ -156,33 +156,33 @@ def cmd_doctor(args: argparse.Namespace) -> int:
 
 
 def cmd_version(args: argparse.Namespace) -> int:
-    print(f"fn-webstore {__version__}")
+    print(f"RohTunnel {__version__}")
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="fn-webstore",
+        prog="rohtunnel",
         description="VPN storefront and order automation for FN AutoSC",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
     initdb = sub.add_parser("initdb", help="create or migrate the SQLite database")
-    initdb.add_argument("--db", help="override FN_WEBSTORE_DB")
+    initdb.add_argument("--db", help="override ROHTUNNEL_DB")
     initdb.set_defaults(func=cmd_initdb)
 
     migrate = sub.add_parser("migrate", help="alias for initdb (forward-only migrations)")
-    migrate.add_argument("--db", help="override FN_WEBSTORE_DB")
+    migrate.add_argument("--db", help="override ROHTUNNEL_DB")
     migrate.set_defaults(func=cmd_initdb)
 
     serve_cmd = sub.add_parser("serve", help="run the HTTP service")
-    serve_cmd.add_argument("--db", help="override FN_WEBSTORE_DB")
-    serve_cmd.add_argument("--bind", help="override FN_WEBSTORE_BIND")
-    serve_cmd.add_argument("--port", type=int, help="override FN_WEBSTORE_PORT")
+    serve_cmd.add_argument("--db", help="override ROHTUNNEL_DB")
+    serve_cmd.add_argument("--bind", help="override ROHTUNNEL_BIND")
+    serve_cmd.add_argument("--port", type=int, help="override ROHTUNNEL_PORT")
     serve_cmd.set_defaults(func=cmd_serve)
 
     doctor = sub.add_parser("doctor", help="check configuration and database health")
-    doctor.add_argument("--db", help="override FN_WEBSTORE_DB")
+    doctor.add_argument("--db", help="override ROHTUNNEL_DB")
     doctor.set_defaults(func=cmd_doctor)
 
     version = sub.add_parser("version", help="print the version")

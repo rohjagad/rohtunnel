@@ -6,16 +6,16 @@ test:
 	$(PYTHON) -m unittest discover -s tests -v
 
 initdb:
-	$(PYTHON) -m fn_webstore initdb
+	$(PYTHON) -m rohtunnel initdb
 
 serve:
-	$(PYTHON) -m fn_webstore serve
+	$(PYTHON) -m rohtunnel serve
 
 doctor:
-	$(PYTHON) -m fn_webstore doctor
+	$(PYTHON) -m rohtunnel doctor
 
 compile:
-	$(PYTHON) -m compileall -q fn_webstore tests
+	$(PYTHON) -m compileall -q rohtunnel tests
 
 clean:
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
