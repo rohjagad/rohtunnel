@@ -3,7 +3,7 @@
 
 [Unit]
 Description=RohTunnel maintenance pass
-Documentation=https://github.com/rohjagad/RohTunnel
+Documentation=https://github.com/rohjagad/rohtunnel
 After=network-online.target rohtunnel.service
 
 [Service]

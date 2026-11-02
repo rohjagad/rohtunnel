@@ -4,7 +4,7 @@
 
 [Unit]
 Description=RohTunnel HTTP service
-Documentation=https://github.com/rohjagad/RohTunnel
+Documentation=https://github.com/rohjagad/rohtunnel
 After=network-online.target
 Wants=network-online.target
 

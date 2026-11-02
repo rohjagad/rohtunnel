@@ -3,7 +3,7 @@
 
 [Unit]
 Description=Run RohTunnel maintenance every minute
-Documentation=https://github.com/rohjagad/RohTunnel
+Documentation=https://github.com/rohjagad/rohtunnel
 
 [Timer]
 OnBootSec=2min

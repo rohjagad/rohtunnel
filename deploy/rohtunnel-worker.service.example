@@ -7,7 +7,7 @@
 
 [Unit]
 Description=RohTunnel provisioning worker
-Documentation=https://github.com/rohjagad/RohTunnel
+Documentation=https://github.com/rohjagad/rohtunnel
 After=network-online.target rohtunnel.service
 Wants=network-online.target
 
